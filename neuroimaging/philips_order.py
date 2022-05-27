@@ -46,20 +46,20 @@ __copyright__ = 'Copyright (c) 2014 Yaroslav Halchenko'
 __license__ = 'MIT'
 
 import sys
-import dicom
+import pydicom
 import numpy as np
 
 np.set_printoptions(linewidth=1000)
 # if decide to be fancy and provide name for that sequence containing SOPInstanceUID
-#from dicom.datadict import DicomDictionary
+#from pydicom.datadict import DicomDictionary
 #DicomDictionary.update({ 0x2005140f: 
 
 def report_order(f):
-    d = dicom.read_file(f, defer_size='1KB', stop_before_pixels=True)
+    d = pydicom.read_file(f, defer_size='1KB', stop_before_pixels=True)
 
-    print "\n", f
-    print " Series:    %s" % (d.SeriesDescription,)
-    print " Sequence:  %s" % (d.PulseSequenceName,)
+    print("\n", f)
+    print(" Series:    %s" % (d.SeriesDescription,))
+    print(" Sequence:  %s" % (d.PulseSequenceName,))
 
     all_slices = d.PerFrameFunctionalGroupsSequence
     slices = [s for s in all_slices
@@ -81,17 +81,17 @@ def report_order(f):
     # so far scale/timing looks not exactly right ;)
     slice_timing = slice_timing - slice_timing[slice_order == 0]
 
-    print " # slices:  %d" % (len(slice_timing_str))
-    print " order:     %s" % slice_order
-    print " TR (sec):  %.2f" % (float(d.SharedFunctionalGroupsSequence[0].MRTimingAndRelatedParametersSequence[0].RepetitionTime)/1000.)
-    print " timing???: %s" % str(slice_timing/100000.)
-    print " max(???):  %.2f" % max(slice_timing/100000.)
+    print(" # slices:  %d" % (len(slice_timing_str)))
+    print(" order:     %s" % slice_order)
+    print(" TR (sec):  %.2f" % (float(d.SharedFunctionalGroupsSequence[0].MRTimingAndRelatedParametersSequence[0].RepetitionTime)/1000.))
+    print(" timing???: %s" % str(slice_timing/100000.))
+    print(" max(???):  %.2f" % max(slice_timing/100000.))
 
 if __name__ == '__main__':
     import sys
     for f in sys.argv[1:]:
         try:
             report_order(f)
-        except Exception, e:
-            print " Failed to figure out for %s (skipped): %s" % (f, e)
+        except Exception as e:
+            print(" Failed to figure out for %s (skipped): %s" % (f, e))
         sys.stdout.flush()
